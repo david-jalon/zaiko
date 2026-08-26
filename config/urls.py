@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from inventory import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("accounts.urls")), # Esto hace que todas las rutas de accounts/urls.py cuelguen de /accounts/
+    path("", views.home, name="home")
 ]
