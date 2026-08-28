@@ -1,0 +1,30 @@
+{% extends "inventory/base.html" %}
+
+{% block title %} Stock Zaiko {% endblock %}
+
+{% block content %}
+<h1>Stock</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Material</th>
+            <th>Color</th>
+            <th>Stock Mínimo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in stocks %}
+            <tr>
+                <td>{{ stock.material }}</td>
+                <td>{{ stock.color }}</td>
+                <td>{{ stock.stock_minimo }}</td>
+                <td>
+                    <a href="{% url 'stock_update' stock.pk %}" class="btn btn-warning">Editar</a>
+                    <a href="{% url 'stock_delete' stock.pk %}" class="btn btn-danger">Borrar</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

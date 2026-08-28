@@ -22,6 +22,24 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("accounts.urls")), # Esto hace que todas las rutas de accounts/urls.py cuelguen de /accounts/
     path("", views.home, name="home"),
+    # Rutas de spools
     path("spools/", views.SpoolListView.as_view(), name="spool_list"),
     path("spools/nueva/", views.SpoolCreateView.as_view(), name="spool_create"),
+    path("spools/<int:pk>/editar/", views.SpoolUpdateView.as_view(), name="spool_update"),
+    path("spools/<int:pk>/borrar/", views.SpoolDeleteView.as_view(), name="spool_delete"),
+    # Rutas de materials
+    path("materiales/", views.MaterialListView.as_view(), name="material_list"),
+    path("materiales/nuevo/", views.MaterialCreateView.as_view(), name="material_create"),
+    path("materiales/<int:pk>/editar/", views.MaterialUpdateView.as_view(), name="material_update"),
+    path("materiales/<int:pk>/borrar/", views.MaterialDeleteView.as_view(), name="material_delete"),
+    # Rutas de color
+    path("color/", views.ColorListView.as_view(), name="color_list"),
+    path("color/nuevo/", views.ColorCreateView.as_view(), name="color_create"),
+    path("color/<int:pk>/editar/", views.ColorUpdateView.as_view(), name="color_update"),
+    path("color/<int:pk>/borrar/", views.ColorDeleteView.as_view(), name="color_delete"),
+    # Rutas de stockthreshold
+    path("stock/", views.StockThresholdListView.as_view(), name="stock_list"),
+    path("stock/nuevo/", views.StockThresholdCreateView.as_view(), name="stock_create"),
+    path("stock/<int:pk>/editar/", views.StockThresholdUpdateView.as_view(), name="stock_update"),
+    path("stock/<int:pk>/borrar/", views.StockThresholdDeleteView.as_view(), name="stock_delete"),
 ]

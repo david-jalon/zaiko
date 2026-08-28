@@ -1,0 +1,28 @@
+{% extends "inventory/base.html" %}
+
+{% block title %} Materiales Zaiko {% endblock %}
+
+{% block content %}
+<h1>Materiales</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tipo</th>
+            <th>Subtipo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for material in materials %}
+            <tr>
+                <td>{{ material.tipo }}</td>
+                <td>{{ material.subtipo }}</td>
+                <td>
+                    <a href="{% url 'material_update' material.pk %}" class="btn btn-warning">Editar</a>
+                    <a href="{% url 'material_delete' material.pk %}" class="btn btn-danger">Borrar</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

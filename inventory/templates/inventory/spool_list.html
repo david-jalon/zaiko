@@ -11,6 +11,7 @@
             <th>Color</th>
             <th>Peso actual (g)</th>
             <th>Estado</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -20,6 +21,10 @@
                 <td>{{ spool.color }}</td>
                 <td>{{ spool.peso_actual }}</td>
                 <td>{{ spool.estado }}</td>
+                <td>
+                    <a href="{% url 'spool_update' spool.pk %}" class="btn btn-warning">Editar</a>
+                    <a href="{% url 'spool_delete' spool.pk %}" class="btn btn-danger">Borrar</a>
+                </td>
             </tr>
         {% endfor %}
     </tbody>

@@ -1,0 +1,14 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Borrar material — Zaiko{% endblock %}
+
+{% block content %}
+<h1>Borrar material</h1>
+<p>{{ object }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sí, borrar</button>
+    <a href="{% url 'material_list' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

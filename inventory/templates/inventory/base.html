@@ -18,6 +18,15 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'spool_list' %}">Bobinas</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'material_list' %}">Materiales</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'color_list' %}">Colores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'stock_list' %}">Stock</a>
+                        </li>
                     </ul>
                     <form method="post" action="{% url 'logout' %}" class="d-flex">
                         {% csrf_token %}

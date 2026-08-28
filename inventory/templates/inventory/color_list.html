@@ -1,0 +1,26 @@
+{% extends "inventory/base.html" %}
+
+{% block title %} Colores Zaiko {% endblock %}
+
+{% block content %}
+<h1>Colores</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for color in colors %}
+            <tr>
+                <td>{{ color.nombre }}</td>
+                <td>
+                    <a href="{% url 'color_update' color.pk %}" class="btn btn-warning">Editar</a>
+                    <a href="{% url 'color_delete' color.pk %}" class="btn btn-danger">Borrar</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

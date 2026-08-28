@@ -1,9 +1,9 @@
 {% extends "inventory/base.html" %}
 
-{% block title %}Nueva bobina — Zaiko{% endblock %}
+{% block title %}Nuevo stock — Zaiko{% endblock %}
 
 {% block content %}
-<h1>{% if object %}Editar bobina{% else %}Nueva bobina{% endif %}</h1>
+<h1>{% if object %}Editar stock{% else %}Nuevo stock{% endif %}</h1>
 
 <form method="post">
     {% csrf_token %}
