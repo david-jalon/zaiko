@@ -1,0 +1,27 @@
+{% extends "inventory/base.html" %}
+
+{% block title %} Bobinas Zaiko {% endblock %}
+
+{% block content %}
+<h1>Bobinas</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Material</th>
+            <th>Color</th>
+            <th>Peso actual (g)</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for spool in spools %}
+            <tr>
+                <td>{{ spool.material }}</td>
+                <td>{{ spool.color }}</td>
+                <td>{{ spool.peso_actual }}</td>
+                <td>{{ spool.estado }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

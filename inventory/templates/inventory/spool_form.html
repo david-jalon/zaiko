@@ -1,0 +1,13 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Nueva bobina — Zaiko{% endblock %}
+
+{% block content %}
+<h1>Nueva Bobina</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+{% endblock %}

@@ -21,5 +21,7 @@ from inventory import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("accounts.urls")), # Esto hace que todas las rutas de accounts/urls.py cuelguen de /accounts/
-    path("", views.home, name="home")
+    path("", views.home, name="home"),
+    path("spools/", views.SpoolListView.as_view(), name="spool_list"),
+    path("spools/nueva/", views.SpoolCreateView.as_view(), name="spool_create"),
 ]
