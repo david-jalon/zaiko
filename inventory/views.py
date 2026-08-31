@@ -4,7 +4,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Spool, Material, Color, StockThreshold
+from .models import PrintOrder, Spool, Material, Color, StockThreshold
+from .forms import PrintOrderForm
 
 
 # Create your views here.
@@ -110,3 +111,11 @@ class StockThresholdDeleteView(LoginRequiredMixin, OperatorRequiredMixin, Delete
     model = StockThreshold
     template_name = "inventory/stock_confirm_delete.html"
     success_url = reverse_lazy("stock_list")
+
+
+# Vista para crear una orden de impresión
+class PrintOrderCreateView(CreateView):
+    model = PrintOrder
+    form_class = PrintOrderForm
+    template_name = "inventory/printorder_form.html"
+    success_url = reverse_lazy("printorder_list")
