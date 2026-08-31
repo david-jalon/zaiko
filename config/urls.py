@@ -45,4 +45,6 @@ urlpatterns = [
     # Rutas de ordenes de impresión
     path("ordenes/", views.PrintOrderListView.as_view(), name="printorder_list"),
     path("ordenes/nueva/", views.PrintOrderCreateView.as_view(), name="printorder_create"),
+    # Rutas de exportación
+    path("exportar/inventario/", views.export_inventory_csv, name="exportar_inventario"),
 ]

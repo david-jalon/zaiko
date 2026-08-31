@@ -7,6 +7,8 @@ from django.urls import reverse_lazy
 from django.db.models import Sum, Count
 from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
 from .forms import PrintOrderForm
+import csv
+from django.http import HttpResponse
 
 
 @login_required
@@ -127,6 +129,7 @@ class PrintOrderCreateView(LoginRequiredMixin, OperatorRequiredMixin, CreateView
     success_url = reverse_lazy("printorder_list")
 
 
+# Vista del dashboard
 @login_required
 def dashboard(request):
     # KPIs
@@ -166,3 +169,32 @@ def dashboard(request):
     }
 
     return render(request, "inventory/dashboard.html", context)
+
+
+# Vista para exportar el inventario a CSV
+@login_required
+def export_inventory_csv(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="inventario.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(["Material", "Color", "Marca", "Peso actual (g)", "Estado"])
+    for spool in Spool.objects.select_related("material", "color"):
+        writer.writerow([
+            spool.material, spool.color, spool.marca, spool.peso_actual, spool.estado
+        ])
+    return response
+
+@login_required
+def export_printorders_csv(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="ordenes_impresion.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(["Pieza", "Impresora", "Bobina", "Gramos usados", "Duración (min)", "Fecha inicio", "Fecha fin"])
+    for order in PrintOrder.objects.select_related("printer", "spool"):
+        writer.writerow([
+            order.pieza, order.printer, order.spool, order.gramos_usados, order.duracion_minutos, order.fecha_inicio, order.fecha_fin
+        ])
+    return response
+
