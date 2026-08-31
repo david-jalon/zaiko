@@ -4,11 +4,11 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import PrintOrder, Spool, Material, Color, StockThreshold
+from django.db.models import Sum, Count
+from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
 from .forms import PrintOrderForm
 
 
-# Create your views here.
 @login_required
 def home(request):
     return render(request, "inventory/home.html")
@@ -114,8 +114,55 @@ class StockThresholdDeleteView(LoginRequiredMixin, OperatorRequiredMixin, Delete
 
 
 # Vista para crear una orden de impresión
-class PrintOrderCreateView(CreateView):
+class PrintOrderListView(LoginRequiredMixin, OperatorRequiredMixin, ListView):
+    model = PrintOrder
+    template_name = "inventory/printorder_list.html"
+    context_object_name = "printorders"
+    queryset = PrintOrder.objects.select_related("printer", "spool").order_by("-fecha_inicio")
+
+class PrintOrderCreateView(LoginRequiredMixin, OperatorRequiredMixin, CreateView):
     model = PrintOrder
     form_class = PrintOrderForm
     template_name = "inventory/printorder_form.html"
     success_url = reverse_lazy("printorder_list")
+
+
+@login_required
+def dashboard(request):
+    # KPIs
+    total_bobinas = Spool.objects.count()
+    bobinas_abiertas = Spool.objects.filter(estado="Abierta").count()
+    gramos_totales = Spool.objects.aggregate(total_gramos=Sum("peso_actual"))["total_gramos"] or 0
+    piezas_impresas = PrintOrder.objects.count()
+    horas_totales = PrintOrder.objects.aggregate(total=Sum("duracion_minutos"))["total"] or 0
+
+    # Stock por material+color con alerta
+    stock_por_combinacion = (
+        Spool.objects.values("material", "color").annotate(total=Sum("peso_actual"))
+    )
+
+    alertas = []
+    for item in stock_por_combinacion:
+        umbral = StockThreshold.objects.filter(material_id=item["material"], color_id=item["color"]).first()
+        if umbral and item["total"] < umbral.stock_minimo:
+            alertas.append({
+                "material": Material.objects.get(id=item["material"]),
+                "color": Color.objects.get(id=item["color"]),
+                "stock_actual": item["total"],
+                "stock_minimo": umbral.stock_minimo,
+            })
+
+    # Últimas órdenes
+    ultimas_ordenes = PrintOrder.objects.select_related("printer", "spool")[:5]
+
+    context = {
+        "total_bobinas": total_bobinas,
+        "bobinas_abiertas": bobinas_abiertas,
+        "gramos_totales": gramos_totales,
+        "piezas_impresas": piezas_impresas,
+        "horas_totales": round(horas_totales / 60, 1),  # Convertir minutos a horas y redondear a 1 decimal
+        "alertas": alertas,
+        "ultimas_ordenes": ultimas_ordenes,
+    }
+
+    return render(request, "inventory/dashboard.html", context)
