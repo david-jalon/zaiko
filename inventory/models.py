@@ -90,9 +90,12 @@ class PrintOrder(models.Model):
         if es_nueva:
             # Actualiza el peso_actual del spool asociado
             self.spool.peso_actual -= self.gramos_usados
-            if self.spool.peso_actual < 0:
+            if self.spool.peso_actual <= 0:
                 self.spool.peso_actual = 0
                 self.spool.estado = "Vacía"
+
+            self.printer.horas_uso += self.duracion_minutos / 60  # Convierte minutos a horas
+            self.printer.save()  # Guarda la impresora actualizada
             self.spool.save() # Guarda la bobina actualizada
 
     
