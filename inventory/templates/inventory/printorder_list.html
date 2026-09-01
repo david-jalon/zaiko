@@ -5,6 +5,7 @@
 {% block content %}
 <h1>Órdenes de impresión</h1>
 <a href="{% url 'printorder_create' %}" class="btn btn-primary mb-3">Nueva orden</a>
+<a href="{% url 'exportar_ordenes' %}" class="btn btn-success mb-3">Exportar CSV</a>
 <table class="table table-striped">
     <thead>
         <tr>
