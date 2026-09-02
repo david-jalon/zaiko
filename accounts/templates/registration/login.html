@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +20,21 @@
                 <div class="col-lg-6 mb-1 mb-lg-0">
                     <div class="card bg-body-tertiary" style="backdrop-filter: blur(30px);">
                         <div class="card-body p-5 shadow-lg text-center">
-                            <h1 class="fw-bold mb-1 text-success">ZAIKO</h1>
+                            <div class="d-flex align-items-center justify-content-center gap-2 mb-1 text-success">
+                                <svg width="40" height="40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                                    fill="currentColor" role="img" aria-label="Zaiko">
+                                    <g transform="translate(2.000000, 4.000000)">
+                                        <polygon
+                                            points="12.114144 0 11.139744 0.9744 18.228504 8.04552 12.114144 14.15988 6.000624 8.04552 8.920464 5.124 7.955304 4.15968 4.069464 8.04552 12.114144 16.09104 20.160504 8.04552" />
+                                        <polygon
+                                            points="10.122672 9.813216 8.355312 8.045856 10.122672 6.277656 11.890032 8.045856" />
+                                        <polygon
+                                            points="8.045352 0 -0.000168 8.04552 8.045352 16.09104 9.008832 15.12672 1.930992 8.04552 8.045352 1.93116 14.158872 8.04552 11.239032 10.9662 12.205032 11.9322 16.090872 8.04552" />
+                                    </g>
+                                </svg>
+                                <h1 class="fw-bold mb-0">ZAIKO</h1>
+                            </div>
+
                             <p class="text-muted mb-4">Gestión de inventario para impresión 3D</p>
 
                             <form method="post">
@@ -37,7 +52,7 @@
                                 </div>
 
                                 {% for error in form.non_field_errors %}
-                                    <div class="alert alert-danger py-2">{{ error }}</div>
+                                <div class="alert alert-danger py-2">{{ error }}</div>
                                 {% endfor %}
 
                                 <button type="submit" class="btn btn-success btn-lg w-100 fw-bold">Entrar</button>
@@ -48,7 +63,8 @@
 
                 <div class="col-lg-4 mb-1 mb-lg-0">
                     <div class="card text-bg-dark shadow-lg rounded-4">
-                        <div class="card-header text-start bg-success text-dark fw-bold small">zaiko@inventory — zsh</div>
+                        <div class="card-header text-start bg-success text-dark fw-bold small">zaiko@inventory — zsh
+                        </div>
                         <div class="card-body text-start">
                             <p class="mb-1 text-white-50">$ zaiko status</p>
                             <p class="mb-0"><span class="text-success">[ok]</span> bobinas en stock</p>
@@ -66,4 +82,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
