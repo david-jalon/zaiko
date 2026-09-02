@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import PrintOrder, PrintOrderItem
+from .models import PrintOrder, PrintOrderItem, Spool
 
 
 class PrintOrderForm(forms.ModelForm):
@@ -69,3 +69,13 @@ PrintOrderItemFormSet = inlineformset_factory(
     validate_max=True,
     can_delete=False,
 )
+
+class SpoolForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({"class": "form-control"})
+
+    class Meta:
+        model = Spool
+        fields = ["material", "color", "marca", "diametro", "costo_por_kg", "peso_inicial", "peso_actual", "estado", "fecha_compra"]

@@ -6,7 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count
 from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
-from .forms import PrintOrderForm, PrintOrderItemFormSet
+from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm
 import csv
 from django.http import HttpResponse
 
@@ -25,13 +25,13 @@ class SpoolListView(LoginRequiredMixin, OperatorRequiredMixin, ListView):
 class SpoolCreateView(LoginRequiredMixin, OperatorRequiredMixin, CreateView):
     model = Spool
     template_name = "inventory/spool_form.html"
-    fields = ["material", "color", "marca", "diametro", "costo_por_kg", "peso_inicial", "peso_actual", "estado", "fecha_compra"]
+    form_class = SpoolForm
     success_url = reverse_lazy("spool_list")
 
 class SpoolUpdateView(LoginRequiredMixin, OperatorRequiredMixin, UpdateView):
     model = Spool
     template_name = "inventory/spool_form.html"
-    fields = ["material", "color", "marca", "diametro", "costo_por_kg", "peso_inicial", "peso_actual", "estado", "fecha_compra"]
+    form_class = SpoolForm
     success_url = reverse_lazy("spool_list")
 
 class SpoolDeleteView(LoginRequiredMixin, OperatorRequiredMixin, DeleteView):

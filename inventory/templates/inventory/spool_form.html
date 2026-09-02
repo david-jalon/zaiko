@@ -3,11 +3,58 @@
 {% block title %}Nueva bobina — Zaiko{% endblock %}
 
 {% block content %}
-<h1>{% if object %}Editar bobina{% else %}Nueva bobina{% endif %}</h1>
+<h1 class="mb-4">{% if object %}Editar bobina{% else %}Nueva bobina{% endif %}</h1>
 
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Guardar</button>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Datos de la bobina</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.material.label }}</label>
+                    {{ form.material }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.color.label }}</label>
+                    {{ form.color }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.marca.label }}</label>
+                    {{ form.marca }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.diametro.label }}</label>
+                    {{ form.diametro }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.costo_por_kg.label }}</label>
+                    {{ form.costo_por_kg }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.estado.label }}</label>
+                    {{ form.estado }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.peso_inicial.label }}</label>
+                    {{ form.peso_inicial }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.peso_actual.label }}</label>
+                    {{ form.peso_actual }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.fecha_compra.label }}</label>
+                    {{ form.fecha_compra }}
+                </div>
+            </div>
+            {% if form.errors %}
+                <div class="alert alert-danger mt-3">{{ form.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar bobina</button>
 </form>
 {% endblock %}

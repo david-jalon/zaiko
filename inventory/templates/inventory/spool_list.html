@@ -3,31 +3,47 @@
 {% block title %} Bobinas Zaiko {% endblock %}
 
 {% block content %}
-<h1>Bobinas</h1>
-<a href="{% url 'exportar_inventario' %}" class="btn btn-success">Exportar CSV</a>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Material</th>
-            <th>Color</th>
-            <th>Peso actual (g)</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for spool in spools %}
-            <tr>
-                <td>{{ spool.material }}</td>
-                <td>{{ spool.color }}</td>
-                <td>{{ spool.peso_actual }}</td>
-                <td>{{ spool.estado }}</td>
-                <td>
-                    <a href="{% url 'spool_update' spool.pk %}" class="btn btn-warning">Editar</a>
-                    <a href="{% url 'spool_delete' spool.pk %}" class="btn btn-danger">Borrar</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Bobinas</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'spool_create' %}" class="btn btn-success">Nueva bobina</a>
+        <a href="{% url 'exportar_inventario' %}" class="btn btn-success">Exportar CSV</a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Listado de bobinas</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Color</th>
+                    <th>Peso actual (g)</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for spool in spools %}
+                <tr>
+                    <td>{{ spool.material }}</td>
+                    <td>{{ spool.color }}</td>
+                    <td>{{ spool.peso_actual }}</td>
+                    <td>
+                        <span class="badge {% if spool.estado == 'Vacía' %}bg-danger{% elif spool.estado == 'Abierta' %}bg-success{% else %}bg-secondary{% endif %}">{{ spool.estado }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'spool_update' spool.pk %}" class="btn btn-warning">Editar</a>
+                        <a href="{% url 'spool_delete' spool.pk %}" class="btn btn-danger">Borrar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 {% endblock %}

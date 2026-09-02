@@ -3,12 +3,17 @@
 {% block title %}Borrar bobina — Zaiko{% endblock %}
 
 {% block content %}
-<h1>Borrar bobina</h1>
-<p>{{ object }}</p>
-
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Sí, borrar</button>
-    <a href="{% url 'spool_list' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Borrar bobina</h5>
+    </div>
+    <div class="card-body">
+        <p>¿Seguro que quieres borrar <strong>{{ object }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Sí, borrar</button>
+            <a href="{% url 'spool_list' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
 {% endblock %}
