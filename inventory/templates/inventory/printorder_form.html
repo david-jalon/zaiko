@@ -8,6 +8,20 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+
+    <h3>Filamentos usados (máx. 6)</h3>
+    {{ items_formset.management_form }}
+    {% for item in items_formset %}
+        <div class="row g-2 mb-2">
+            <div class="col-md-8">{{ item.spool }}</div>
+            <div class="col-md-4">{{ item.gramos_usados }}</div>
+        </div>
+        {{ item.id }}
+    {% endfor %}
+    {% if items_formset.errors %}
+        <div class="alert alert-danger">{{ items_formset.errors }}</div>
+    {% endif %}
+
     <button type="submit" class="btn btn-primary">Guardar</button>
 </form>
 {% endblock %}

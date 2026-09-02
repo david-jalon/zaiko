@@ -59,8 +59,7 @@
         <tr>
             <th>Pieza</th>
             <th>Impresora</th>
-            <th>Bobina</th>
-            <th>Gramos</th>
+            <th>Filamentos</th>
         </tr>
     </thead>
     <tbody>
@@ -68,11 +67,14 @@
         <tr>
             <td>{{ orden.pieza }}</td>
             <td>{{ orden.printer }}</td>
-            <td>{{ orden.spool }}</td>
-            <td>{{ orden.gramos_usados }}</td>
+            <td>
+                {% for item in orden.items.all %}
+                    {{ item.spool }}: {{ item.gramos_usados }}g{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
         </tr>
         {% empty %}
-        <tr><td colspan="4">Aún no hay órdenes.</td></tr>
+        <tr><td colspan="3">Aún no hay órdenes.</td></tr>
         {% endfor %}
     </tbody>
 </table>

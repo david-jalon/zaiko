@@ -6,7 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count
 from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
-from .forms import PrintOrderForm
+from .forms import PrintOrderForm, PrintOrderItemFormSet
 import csv
 from django.http import HttpResponse
 
@@ -115,18 +115,36 @@ class StockThresholdDeleteView(LoginRequiredMixin, OperatorRequiredMixin, Delete
     success_url = reverse_lazy("stock_list")
 
 
-# Vista para crear una orden de impresión
+# Vista para listar las órdenes de impresión
 class PrintOrderListView(LoginRequiredMixin, OperatorRequiredMixin, ListView):
     model = PrintOrder
     template_name = "inventory/printorder_list.html"
     context_object_name = "printorders"
-    queryset = PrintOrder.objects.select_related("printer", "spool").order_by("-fecha_inicio")
+    queryset = PrintOrder.objects.prefetch_related("items__spool").order_by("-fecha_inicio")
 
 class PrintOrderCreateView(LoginRequiredMixin, OperatorRequiredMixin, CreateView):
     model = PrintOrder
     form_class = PrintOrderForm
     template_name = "inventory/printorder_form.html"
     success_url = reverse_lazy("printorder_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context["items_formset"] = PrintOrderItemFormSet(self.request.POST, prefix="items")
+        else:
+            context["items_formset"] = PrintOrderItemFormSet(prefix="items")
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        items_formset = context["items_formset"]
+        if items_formset.is_valid():
+            self.object = form.save()
+            items_formset.instance = self.object
+            items_formset.save()
+            return super().form_valid(form)
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 # Vista del dashboard
@@ -156,7 +174,7 @@ def dashboard(request):
             })
 
     # Últimas órdenes
-    ultimas_ordenes = PrintOrder.objects.select_related("printer", "spool")[:5]
+    ultimas_ordenes = PrintOrder.objects.prefetch_related("items__spool")[:5]
 
     context = {
         "total_bobinas": total_bobinas,
@@ -175,7 +193,7 @@ def dashboard(request):
 @login_required
 def export_inventory_csv(request):
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="inventario.csv"'
+    response["Content-Disposition"] = 'attachment; filename="Inventario_bobinas.csv"'
 
     writer = csv.writer(response)
     writer.writerow(["Material", "Color", "Marca", "Peso actual (g)", "Estado"])
@@ -188,13 +206,14 @@ def export_inventory_csv(request):
 @login_required
 def export_printorders_csv(request):
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="ordenes_impresion.csv"'
+    response["Content-Disposition"] = 'attachment; filename="Ordenes_impresion.csv"'
 
     writer = csv.writer(response)
     writer.writerow(["Pieza", "Impresora", "Bobina", "Gramos usados", "Duración (min)", "Fecha inicio", "Fecha fin"])
-    for order in PrintOrder.objects.select_related("printer", "spool"):
-        writer.writerow([
-            order.pieza, order.printer, order.spool, order.gramos_usados, order.duracion_minutos, order.fecha_inicio, order.fecha_fin
-        ])
+    for order in PrintOrder.objects.prefetch_related("items__spool"):
+        for item in order.items.all():
+            writer.writerow([
+                order.pieza, order.printer, item.spool, item.gramos_usados, order.duracion_minutos, order.fecha_inicio, order.fecha_fin
+            ])
     return response
 

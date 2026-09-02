@@ -70,15 +70,14 @@ class Printer(models.Model):
 class PrintOrder(models.Model):
     pieza = models.CharField(max_length=100)
     printer = models.ForeignKey(Printer, on_delete=models.PROTECT)
-    spool = models.ForeignKey(Spool, on_delete=models.PROTECT)
-    gramos_usados = models.FloatField()
+    spools = models.ManyToManyField(Spool, through="PrintOrderItem")
     duracion_minutos = models.IntegerField()
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     notas = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.pieza} - {self.gramos_usados}g"
+        return f"{self.pieza}"
 
     class Meta:
         ordering = ["-fecha_inicio"]
@@ -88,14 +87,34 @@ class PrintOrder(models.Model):
         super().save(*args, **kwargs) # Guarda primero la instancia para obtener un pk si es nueva
 
         if es_nueva:
-            # Actualiza el peso_actual del spool asociado
+            self.printer.horas_uso += self.duracion_minutos / 60  # Convierte minutos a horas
+            self.printer.save()  # Guarda la impresora actualizada
+
+class PrintOrderItem(models.Model):
+    MAX_FILAMENTOS = 6
+
+    print_order = models.ForeignKey(PrintOrder, on_delete=models.CASCADE, related_name="items")
+    spool = models.ForeignKey(Spool, on_delete=models.PROTECT)
+    gramos_usados = models.FloatField()
+
+    def __str__(self):
+        return f"{self.spool} - {self.gramos_usados}g"
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(gramos_usados__gt=0),
+                name="printorderitem_gramos_positivos"
+            ),
+        ]
+
+    def save(self, *args, **kwargs):
+        es_nueva = self.pk is None
+        super().save(*args, **kwargs)
+
+        if es_nueva:
             self.spool.peso_actual -= self.gramos_usados
             if self.spool.peso_actual <= 0:
                 self.spool.peso_actual = 0
                 self.spool.estado = "Vacía"
-
-            self.printer.horas_uso += self.duracion_minutos / 60  # Convierte minutos a horas
-            self.printer.save()  # Guarda la impresora actualizada
-            self.spool.save() # Guarda la bobina actualizada
-
-    
+            self.spool.save()

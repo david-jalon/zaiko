@@ -11,8 +11,7 @@
         <tr>
             <th>Pieza</th>
             <th>Impresora</th>
-            <th>Bobina</th>
-            <th>Gramos</th>
+            <th>Filamentos</th>
             <th>Duración (min)</th>
             <th>Fecha inicio</th>
         </tr>
@@ -22,13 +21,16 @@
         <tr>
             <td>{{ printorder.pieza }}</td>
             <td>{{ printorder.printer }}</td>
-            <td>{{ printorder.spool }}</td>
-            <td>{{ printorder.gramos_usados }}</td>
+            <td>
+                {% for item in printorder.items.all %}
+                    {{ item.spool }}: {{ item.gramos_usados }}g{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
             <td>{{ printorder.duracion_minutos }}</td>
             <td>{{ printorder.fecha_inicio }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="6">Aún no hay órdenes.</td></tr>
+        <tr><td colspan="5">Aún no hay órdenes.</td></tr>
         {% endfor %}
     </tbody>
 </table>
