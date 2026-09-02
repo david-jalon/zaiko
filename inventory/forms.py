@@ -4,6 +4,21 @@ from .models import PrintOrder, PrintOrderItem
 
 
 class PrintOrderForm(forms.ModelForm):
+    fecha_inicio = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"},
+            format="%Y-%m-%dT%H:%M",
+        ),
+        input_formats=["%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"],
+    )
+    fecha_fin = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local", "class": "form-control"},
+            format="%Y-%m-%dT%H:%M",
+        ),
+        input_formats=["%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"],
+    )
+
     class Meta:
         model = PrintOrder
         fields = ["pieza", "printer", "duracion_minutos", "fecha_inicio", "fecha_fin", "notas"]

@@ -6,12 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Zaiko{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body style="font-family: 'JetBrains Mono', monospace;">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'dashboard' %}">Zaiko</a>
+            <a class="navbar-brand d-flex align-items-center gap-2 text-success" href="{% url 'dashboard' %}">
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    role="img" aria-label="Zaiko">
+                    <g transform="translate(2.000000, 4.000000)">
+                        <polygon
+                            points="12.114144 0 11.139744 0.9744 18.228504 8.04552 12.114144 14.15988 6.000624 8.04552 8.920464 5.124 7.955304 4.15968 4.069464 8.04552 12.114144 16.09104 20.160504 8.04552" />
+                        <polygon points="10.122672 9.813216 8.355312 8.045856 10.122672 6.277656 11.890032 8.045856" />
+                        <polygon
+                            points="8.045352 0 -0.000168 8.04552 8.045352 16.09104 9.008832 15.12672 1.930992 8.04552 8.045352 1.93116 14.158872 8.04552 11.239032 10.9662 12.205032 11.9322 16.090872 8.04552" />
+                    </g>
+                </svg>
+                Zaiko
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
@@ -35,11 +54,12 @@
                 </ul>
                 <form method="post" action="{% url 'logout' %}" class="d-flex">
                     {% csrf_token %}
-                    <button class="btn btn-outline-light" type="submit">Cerrar sesión</button>
+                    <button class="btn btn-outline-success" type="submit">Cerrar sesión</button>
                 </form>
             </div>
         </div>
     </nav>
+
     <main class="container mt-4">
         {% block content %}
         {% endblock %}
