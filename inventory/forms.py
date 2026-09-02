@@ -19,6 +19,11 @@ class PrintOrderForm(forms.ModelForm):
         input_formats=["%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"],
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({"class": "form-control"})
+
     class Meta:
         model = PrintOrder
         fields = ["pieza", "printer", "duracion_minutos", "fecha_inicio", "fecha_fin", "notas"]
@@ -32,6 +37,11 @@ class PrintOrderForm(forms.ModelForm):
         return self.cleaned_data
 
 class PrintOrderItemForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["spool"].widget.attrs.update({"class": "form-control"})
+        self.fields["gramos_usados"].widget.attrs.update({"class": "form-control"})
+        
     class Meta:
         model = PrintOrderItem
         fields = ["spool", "gramos_usados"]

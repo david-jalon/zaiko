@@ -1,27 +1,75 @@
 {% extends "inventory/base.html" %}
 
-{% block title %}Nueva orden — Zaiko{% endblock %}
+{% block title %}Nueva impresión — Zaiko{% endblock %}
 
 {% block content %}
-<h1>{% if object %}Editar orden{% else %}Nueva orden{% endif %}</h1>
+<h1 class="mb-0">{% if object %}Editar impresión{% else %}Nueva impresión{% endif %}</h1>
 
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
 
-    <h3>Filamentos usados (máx. 6)</h3>
-    {{ items_formset.management_form }}
-    {% for item in items_formset %}
-        <div class="row g-2 mb-2">
-            <div class="col-md-8">{{ item.spool }}</div>
-            <div class="col-md-4">{{ item.gramos_usados }}</div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Datos de la impresión</h5>
         </div>
-        {{ item.id }}
-    {% endfor %}
-    {% if items_formset.errors %}
-        <div class="alert alert-danger">{{ items_formset.errors }}</div>
-    {% endif %}
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.pieza.label }}</label>
+                    {{ form.pieza }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.printer.label }}</label>
+                    {{ form.printer }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.duracion_minutos.label }}</label>
+                    {{ form.duracion_minutos }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.fecha_inicio.label }}</label>
+                    {{ form.fecha_inicio }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.fecha_fin.label }}</label>
+                    {{ form.fecha_fin }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">{{ form.notas.label }}</label>
+                    {{ form.notas }}
+                </div>
+            </div>
+            {% if form.errors %}
+                <div class="alert alert-danger mt-3">{{ form.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Filamentos usados (máx. 6)</h5>
+        </div>
+        <div class="card-body">
+            {{ items_formset.management_form }}
+            {% for item in items_formset %}
+                <div class="row g-2 align-items-end mb-2">
+                    <div class="col-md-8">
+                        <label class="form-label">Bobina</label>
+                        {{ item.spool }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Gramos</label>
+                        {{ item.gramos_usados }}
+                    </div>
+                </div>
+                {{ item.id }}
+            {% endfor %}
+            {% if items_formset.errors %}
+                <div class="alert alert-danger">{{ items_formset.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg">Guardar impresión</button>
 </form>
 {% endblock %}

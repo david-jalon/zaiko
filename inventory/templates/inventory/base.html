@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" rel="stylesheet">
 </head>
 
 <body style="font-family: 'JetBrains Mono', monospace;">
@@ -49,7 +50,7 @@
                         <a class="nav-link" href="{% url 'stock_list' %}">Stock</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'printorder_list' %}">Órdenes</a>
+                        <a class="nav-link" href="{% url 'printorder_list' %}">Impresiones</a>
                     </li>
                 </ul>
                 <form method="post" action="{% url 'logout' %}" class="d-flex">
