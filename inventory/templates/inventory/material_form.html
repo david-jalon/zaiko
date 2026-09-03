@@ -3,11 +3,34 @@
 {% block title %}Nuevo material — Zaiko{% endblock %}
 
 {% block content %}
-<h1>{% if object %}Editar material{% else %}Nuevo material{% endif %}</h1>
+<h1 class="mb-4">{% if object %}Editar material{% else %}Nuevo material{% endif %}</h1>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Guardar</button>
-</form>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <form method="post">
+            {% csrf_token %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Datos del material</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">{{ form.tipo.label }}</label>
+                            {{ form.tipo }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ form.subtipo.label }}</label>
+                            {{ form.subtipo }}
+                        </div>
+                    </div>
+                    {% if form.errors %}
+                        <div class="alert alert-danger mt-3">{{ form.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Guardar material</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
