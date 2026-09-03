@@ -1,14 +1,23 @@
 {% extends "inventory/base.html" %}
 
-{% block title %}Borrar stock — Zaiko{% endblock %}
+{% block title %}Borrar umbral de stock — Zaiko{% endblock %}
 
 {% block content %}
-<h1>Borrar stock</h1>
-<p>{{ object }}</p>
-
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Sí, borrar</button>
-    <a href="{% url 'stock_list' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Borrar umbral de stock</h5>
+            </div>
+            <div class="card-body">
+                <p>¿Seguro que quieres borrar el umbral <strong>{{ object }}</strong>?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, borrar</button>
+                    <a href="{% url 'stock_list' %}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

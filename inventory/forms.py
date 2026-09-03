@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Material, PrintOrder, PrintOrderItem, Spool, Color
+from .models import Material, PrintOrder, PrintOrderItem, Spool, Color, StockThreshold
 
 
 class PrintOrderForm(forms.ModelForm):
@@ -99,3 +99,13 @@ class ColorForm(forms.ModelForm):
     class Meta:
         model = Color
         fields = ["nombre"]
+
+class StockThresholdForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({"class": "form-control"})
+
+    class Meta:
+        model = StockThreshold
+        fields = ["material", "color", "stock_minimo"]

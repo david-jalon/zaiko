@@ -6,7 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count
 from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
-from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm, ColorForm
+from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm, ColorForm, StockThresholdForm
 from django.http import HttpResponse
 
 
@@ -99,13 +99,13 @@ class StockThresholdListView(LoginRequiredMixin, OperatorRequiredMixin, ListView
 class StockThresholdCreateView(LoginRequiredMixin, OperatorRequiredMixin, CreateView):
     model = StockThreshold
     template_name = "inventory/stock_form.html"
-    fields = ["material", "color", "stock_minimo"]
+    form_class = StockThresholdForm
     success_url = reverse_lazy("stock_list")
 
 class StockThresholdUpdateView(LoginRequiredMixin, OperatorRequiredMixin, UpdateView):
     model = StockThreshold
     template_name = "inventory/stock_form.html"
-    fields = ["material", "color", "stock_minimo"]
+    form_class = StockThresholdForm
     success_url = reverse_lazy("stock_list")
 
 class StockThresholdDeleteView(LoginRequiredMixin, OperatorRequiredMixin, DeleteView):
