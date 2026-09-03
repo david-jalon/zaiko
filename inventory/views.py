@@ -6,7 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count
 from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
-from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm
+from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm, ColorForm
 from django.http import HttpResponse
 
 
@@ -74,13 +74,13 @@ class ColorListView(LoginRequiredMixin, OperatorRequiredMixin, ListView):
 class ColorCreateView(LoginRequiredMixin, OperatorRequiredMixin, CreateView):
     model = Color
     template_name = "inventory/color_form.html"
-    fields = ["nombre"]
+    form_class = ColorForm
     success_url = reverse_lazy("color_list")
 
 class ColorUpdateView(LoginRequiredMixin, OperatorRequiredMixin, UpdateView):
     model = Color
     template_name = "inventory/color_form.html"
-    fields = ["nombre"]
+    form_class = ColorForm
     success_url = reverse_lazy("color_list")
 
 class ColorDeleteView(LoginRequiredMixin, OperatorRequiredMixin, DeleteView):

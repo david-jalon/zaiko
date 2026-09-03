@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Material, PrintOrder, PrintOrderItem, Spool
+from .models import Material, PrintOrder, PrintOrderItem, Spool, Color
 
 
 class PrintOrderForm(forms.ModelForm):
@@ -89,3 +89,13 @@ class MaterialForm(forms.ModelForm):
     class Meta:
         model = Material
         fields = ["tipo", "subtipo"]
+
+class ColorForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({"class": "form-control"})
+
+    class Meta:
+        model = Color
+        fields = ["nombre"]

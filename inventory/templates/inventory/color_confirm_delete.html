@@ -3,12 +3,21 @@
 {% block title %}Borrar color — Zaiko{% endblock %}
 
 {% block content %}
-<h1>Borrar color</h1>
-<p>{{ object }}</p>
-
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Sí, borrar</button>
-    <a href="{% url 'color_list' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Borrar color</h5>
+            </div>
+            <div class="card-body">
+                <p>¿Seguro que quieres borrar <strong>{{ object }}</strong>?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, borrar</button>
+                    <a href="{% url 'color_list' %}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
