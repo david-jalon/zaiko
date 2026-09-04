@@ -6,7 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count
 from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
-from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm, ColorForm, StockThresholdForm
+from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm, ColorForm, StockThresholdForm, PrintOrderDeleteForm
 from django.http import HttpResponse
 import csv
 
@@ -146,6 +146,46 @@ class PrintOrderCreateView(LoginRequiredMixin, OperatorRequiredMixin, CreateView
             return super().form_valid(form)
         return self.render_to_response(self.get_context_data(form=form))
 
+class PrintOrderUpdateView(LoginRequiredMixin, OperatorRequiredMixin, UpdateView):
+    model = PrintOrder
+    form_class = PrintOrderForm
+    template_name = "inventory/printorder_form.html"
+    success_url = reverse_lazy("printorder_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context["items_formset"] = PrintOrderItemFormSet(self.request.POST, instance=self.object, prefix="items")
+        else:
+            context["items_formset"] = PrintOrderItemFormSet(instance=self.object, prefix="items")
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        items_formset = context["items_formset"]
+        if items_formset.is_valid():
+            self.object = form.save()
+            items_formset.instance = self.object
+            items_formset.save()
+            return super().form_valid(form)
+        return self.render_to_response(self.get_context_data(form=form))
+
+
+class PrintOrderDeleteView(LoginRequiredMixin, OperatorRequiredMixin, DeleteView):
+    model = PrintOrder
+    template_name = "inventory/printorder_confirm_delete.html"
+    success_url = reverse_lazy("printorder_list")
+    form_class = PrintOrderDeleteForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["delete_form"] = PrintOrderDeleteForm()
+        return context
+
+    def form_valid(self, form):                # ← reemplaza el override de delete()
+        if form.cleaned_data["devolver_bobinas"] == "devolver":
+            self.object.revertir_consumo()
+        return super().form_valid(form)    
 
 # Vista del dashboard
 @login_required

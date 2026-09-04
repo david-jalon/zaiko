@@ -5,7 +5,7 @@
 {% block content %}
 <h1 class="mb-0">{% if object %}Editar impresión{% else %}Nueva impresión{% endif %}</h1>
 
-<form method="post">
+<form method="post" id="printorder-form">
     {% csrf_token %}
 
     <div class="card shadow-sm mb-4">
@@ -40,7 +40,7 @@
                 </div>
             </div>
             {% if form.errors %}
-                <div class="alert alert-danger mt-3">{{ form.errors }}</div>
+            <div class="alert alert-danger mt-3">{{ form.errors }}</div>
             {% endif %}
         </div>
     </div>
@@ -52,24 +52,80 @@
         <div class="card-body">
             {{ items_formset.management_form }}
             {% for item in items_formset %}
-                <div class="row g-2 align-items-end mb-2">
-                    <div class="col-md-8">
-                        <label class="form-label">Bobina</label>
-                        {{ item.spool }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Gramos</label>
-                        {{ item.gramos_usados }}
-                    </div>
+            <div class="row g-2 align-items-end mb-2">
+                <div class="col-md-8">
+                    <label class="form-label">Bobina</label>
+                    {{ item.spool }}
                 </div>
-                {{ item.id }}
+                <div class="col-md-4">
+                    <label class="form-label">Gramos</label>
+                    {{ item.gramos_usados }}
+                </div>
+            </div>
+            {{ item.id }}
             {% endfor %}
             {% if items_formset.errors %}
-                <div class="alert alert-danger">{{ items_formset.errors }}</div>
+            <div class="alert alert-danger">{{ items_formset.errors }}</div>
             {% endif %}
         </div>
     </div>
 
-    <button type="submit" class="btn btn-success btn-lg">Guardar impresión</button>
+    <!-- Botón que abre el modal (type="button", no submit) -->
+    <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#confirmarModal">
+        Guardar impresión
+    </button>
 </form>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmarModal" tabindex="-1" aria-labelledby="confirmarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="confirmarModalLabel">¿Guardar impresión?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Esta acción <strong>descontará material</strong> de las bobinas y <strong>sumará horas</strong> a la
+                    impresora:</p>
+                <ul id="resumen-filamentos"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmarGuardar">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('confirmarGuardar').addEventListener('click', function () {
+        document.getElementById('printorder-form').submit();
+    });
+
+    var modal = document.getElementById('confirmarModal');
+    modal.addEventListener('show.bs.modal', function () {
+        var ul = document.getElementById('resumen-filamentos');
+        ul.innerHTML = '';
+        var selects = document.querySelectorAll('select[name$="-spool"]');
+        var hay = false;
+
+        selects.forEach(function (sel) {
+            var match = sel.name.match(/items-(\d+)-spool/);
+            if (!match) return;
+            var gramos = document.querySelector('input[name="items-' + match[1] + '-gramos_usados"]');
+            if (sel.value && gramos && gramos.value) {
+                hay = true;
+                var li = document.createElement('li');
+                li.textContent = sel.selectedOptions[0].text + ' — ' + gramos.value + ' g';
+                ul.appendChild(li);
+            }
+        });
+
+        if (!hay) {
+            var li = document.createElement('li');
+            li.textContent = 'No hay filamentos seleccionados.';
+            ul.appendChild(li);
+        }
+    });
+</script>
 {% endblock %}

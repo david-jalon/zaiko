@@ -1,0 +1,28 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Borrar impresión — Zaiko{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Borrar impresión</h5>
+            </div>
+            <div class="card-body">
+                <p>¿Seguro que quieres borrar la impresión <strong>{{ object }}</strong>?</p>
+                <p>Si no llegó a imprimirse, puedes <strong>devolver el material a las bobinas</strong>.</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {{ delete_form }}
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-danger">Sí, borrar</button>
+                        <a href="{% url 'printorder_list' %}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

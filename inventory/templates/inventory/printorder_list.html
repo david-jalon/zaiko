@@ -26,6 +26,7 @@
                             <th>Filamentos</th>
                             <th>Duración (min)</th>
                             <th>Fecha inicio</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,14 +36,22 @@
                             <td>{{ printorder.printer }}</td>
                             <td>
                                 {% for item in printorder.items.all %}
-                                    {{ item.spool }}: {{ item.gramos_usados }}g{% if not forloop.last %}, {% endif %}
+                                {{ item.spool }}: {{ item.gramos_usados }}g{% if not forloop.last %}, {% endif %}
                                 {% endfor %}
                             </td>
                             <td>{{ printorder.duracion_minutos }}</td>
                             <td>{{ printorder.fecha_inicio }}</td>
+                            <td>
+                                <a href="{% url 'printorder_update' printorder.pk %}"
+                                    class="btn btn-sm btn-warning">Editar</a>
+                                <a href="{% url 'printorder_delete' printorder.pk %}"
+                                    class="btn btn-sm btn-danger">Borrar</a>
+                            </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="5">Aún no hay impresiones.</td></tr>
+                        <tr>
+                            <td colspan="6">Aún no hay impresiones.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>

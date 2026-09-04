@@ -109,3 +109,14 @@ class StockThresholdForm(forms.ModelForm):
     class Meta:
         model = StockThreshold
         fields = ["material", "color", "stock_minimo"]
+
+class PrintOrderDeleteForm(forms.Form):
+    ACCIONES = [
+        ("devolver", "Devolver el material a las bobinas"),
+        ("dejar", "Dejar las bobinas como están"),
+    ]
+    devolver_bobinas = forms.ChoiceField(
+        choices=ACCIONES,
+        widget=forms.RadioSelect,
+        initial="devolver",
+    )

@@ -91,3 +91,63 @@ def test_export_csv(db, client, operador, spool):
     response = client.get("/exportar/inventario/")
     assert response.status_code == 200
     assert response["Content-Type"] == "text/csv"
+
+def test_editar_impresion_ajusta_bobinas(spool, printer, material, color, client, operador):
+    client.login(username="operador", password="test1234")
+    orden = PrintOrder.objects.create(
+        pieza="Pieza A", printer=printer,
+        duracion_minutos=60, fecha_inicio="2026-01-01 10:00:00", fecha_fin="2026-01-01 11:00:00",
+    )
+    item = PrintOrderItem.objects.create(print_order=orden, spool=spool, gramos_usados=30)
+    spool.refresh_from_db()
+    assert spool.peso_actual == 970
+
+    response = client.post(f"/ordenes/{orden.pk}/editar/", {
+        "pieza": "Pieza A",
+        "printer": printer.pk,
+        "duracion_minutos": 60,
+        "fecha_inicio": "2026-01-01 10:00:00",
+        "fecha_fin": "2026-01-01 11:00:00",
+        "items-TOTAL_FORMS": "1", "items-INITIAL_FORMS": "1",
+        "items-MIN_NUM_FORMS": "0", "items-MAX_NUM_FORMS": "6",
+        "items-0-id": item.pk,
+        "items-0-spool": spool.pk,
+        "items-0-gramos_usados": 40,
+    })
+    assert response.status_code == 302  # redirige tras guardar
+    spool.refresh_from_db()
+    assert spool.peso_actual == 960  # 1000 - 40 (se deshizo 30 y se aplicó 40)
+
+
+def test_eliminar_con_devolucion(spool, printer, material, color, client, operador):
+    client.login(username="operador", password="test1234")
+    orden = PrintOrder.objects.create(
+        pieza="Pieza A", printer=printer,
+        duracion_minutos=60, fecha_inicio="2026-01-01 10:00:00", fecha_fin="2026-01-01 11:00:00",
+    )
+    PrintOrderItem.objects.create(print_order=orden, spool=spool, gramos_usados=30)
+    spool.refresh_from_db()
+    assert spool.peso_actual == 970
+
+    response = client.post(f"/ordenes/{orden.pk}/borrar/", {"devolver_bobinas": "devolver"})
+    print("LOCATION:", response.get("Location"))
+    print("ORDEN EXISTE:", PrintOrder.objects.filter(pk=orden.pk).exists())
+    assert response.status_code == 302
+    spool.refresh_from_db()
+    assert spool.peso_actual == 1000  # se devolvió el material
+
+
+def test_eliminar_sin_devolucion(spool, printer, material, color, client, operador):
+    client.login(username="operador", password="test1234")
+    orden = PrintOrder.objects.create(
+        pieza="Pieza A", printer=printer,
+        duracion_minutos=60, fecha_inicio="2026-01-01 10:00:00", fecha_fin="2026-01-01 11:00:00",
+    )
+    PrintOrderItem.objects.create(print_order=orden, spool=spool, gramos_usados=30)
+    spool.refresh_from_db()
+    assert spool.peso_actual == 970
+
+    response = client.post(f"/ordenes/{orden.pk}/borrar/", {"devolver_bobinas": "dejar"})
+    assert response.status_code == 302
+    spool.refresh_from_db()
+    assert spool.peso_actual == 970  # el material no se devuelve

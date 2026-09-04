@@ -84,11 +84,23 @@ class PrintOrder(models.Model):
 
     def save(self, *args, **kwargs):
         es_nueva = self.pk is None # True si la instancia es nueva (no tiene pk asignado)
+        duracion_anterior = 0 if es_nueva else PrintOrder.objects.get(pk=self.pk).duracion_minutos 
         super().save(*args, **kwargs) # Guarda primero la instancia para obtener un pk si es nueva
 
-        if es_nueva:
-            self.printer.horas_uso += self.duracion_minutos / 60  # Convierte minutos a horas
-            self.printer.save()  # Guarda la impresora actualizada
+        delta_horas = (self.duracion_minutos - duracion_anterior) / 60
+        if delta_horas != 0:
+            self.printer.horas_uso += delta_horas
+            self.printer.save()
+
+    def revertir_consumo(self):
+        for item in self.items.all():
+            item.spool.peso_actual += item.gramos_usados
+            if item.spool.peso_actual > 0:
+                item.spool.estado = "Abierta"
+            item.spool.save()
+
+        self.printer.horas_uso -= self.duracion_minutos / 60
+        self.printer.save()
 
 class PrintOrderItem(models.Model):
     MAX_FILAMENTOS = 6
@@ -110,9 +122,24 @@ class PrintOrderItem(models.Model):
 
     def save(self, *args, **kwargs):
         es_nueva = self.pk is None
-        super().save(*args, **kwargs)
 
         if es_nueva:
+            super().save(*args, **kwargs)
+            self.spool.peso_actual -= self.gramos_usados
+            if self.spool.peso_actual <= 0:
+                self.spool.peso_actual = 0
+                self.spool.estado = "Vacía"
+            self.spool.save()
+        else:
+            previo = PrintOrderItem.objects.get(pk=self.pk)
+            previo.spool.peso_actual += previo.gramos_usados
+            if previo.spool.peso_actual > 0:
+                previo.spool.estado = "Abierta"
+            previo.spool.save()
+
+            super().save(*args, **kwargs)
+
+            self.spool.refresh_from_db()
             self.spool.peso_actual -= self.gramos_usados
             if self.spool.peso_actual <= 0:
                 self.spool.peso_actual = 0
