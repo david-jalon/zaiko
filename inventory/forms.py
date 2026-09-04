@@ -131,7 +131,7 @@ class OtroGastoForm(forms.Form):
             field.widget.attrs.update({"class": "form-control"})
 
 
-OtrosGastosFormSet = formset_factory(OtroGastoForm, extra=2)
+OtrosGastosFormSet = formset_factory(OtroGastoForm, extra=1)
 
 class CalculadoraForm(forms.Form):
     nombre_pieza = forms.CharField(label="Nombre de la pieza")
@@ -139,7 +139,7 @@ class CalculadoraForm(forms.Form):
     gramos = forms.FloatField(label="Gramos a imprimir")
     merma = forms.IntegerField(initial=8, label="Merma (%)")
     duracion_min = forms.IntegerField(label="Duración (min)")
-    margen = forms.IntegerField(initial=30, label="Margen (%)")
+    margen = forms.IntegerField(initial=120, label="Margen (%)")
 
     incluir_electricidad = forms.BooleanField(required=False, label="Incluir electricidad")
     potencia_w = forms.IntegerField(initial=220, label="Potencia de la impresora (W)", required=False)

@@ -53,7 +53,8 @@
                             <h5 class="mb-0">Electricidad</h5>
                             <div class="form-check form-switch mb-0">
                                 {{ form.incluir_electricidad }}
-                                <label class="form-check-label" for="{{ form.incluir_electricidad.id_for_label }}">Incluir</label>
+                                <label class="form-check-label"
+                                    for="{{ form.incluir_electricidad.id_for_label }}">Incluir</label>
                             </div>
                         </div>
                         <div class="card-body">
@@ -76,7 +77,8 @@
                             <h5 class="mb-0">Mantenimiento</h5>
                             <div class="form-check form-switch mb-0">
                                 {{ form.incluir_mantenimiento }}
-                                <label class="form-check-label" for="{{ form.incluir_mantenimiento.id_for_label }}">Incluir</label>
+                                <label class="form-check-label"
+                                    for="{{ form.incluir_mantenimiento.id_for_label }}">Incluir</label>
                             </div>
                         </div>
                         <div class="card-body">
@@ -91,7 +93,8 @@
                             <h5 class="mb-0">Mano de obra</h5>
                             <div class="form-check form-switch mb-0">
                                 {{ form.incluir_mano_obra }}
-                                <label class="form-check-label" for="{{ form.incluir_mano_obra.id_for_label }}">Incluir</label>
+                                <label class="form-check-label"
+                                    for="{{ form.incluir_mano_obra.id_for_label }}">Incluir</label>
                             </div>
                         </div>
                         <div class="card-body">
@@ -111,67 +114,98 @@
                         </div>
                         <div class="card-body">
                             {{ otros_formset.management_form }}
+                        <div id="otros-filas">
                             {% for fila in otros_formset %}
-                            <div class="row g-2 align-items-end mb-2">
+                            <div class="row g-2 align-items-end mb-2 fila-gasto">
                                 <div class="col-md-7">
                                     <label class="form-label">Concepto</label>
                                     {{ fila.nombre }}
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <label class="form-label">Importe (€)</label>
                                     {{ fila.valor }}
                                 </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-danger btn-remove-otro">×</button>
+                                </div>
                             </div>
                             {% endfor %}
-                            {% if otros_formset.errors %}
-                            <div class="alert alert-danger mt-2">{{ otros_formset.errors }}</div>
-                            {% endif %}
+                        </div>
+                        <button type="button" id="btn-add-otros" class="btn btn-sm btn-outline-success">+ Añadir otro
+                            gasto</button>
+
+                        {% for fila in otros_formset %}
+                        {% if fila.errors %}
+                        <div class="alert alert-danger mt-2">{{ fila.errors }}</div>
+                        {% endif %}
+                        {% endfor %}
+                        {% if otros_formset.non_form_errors %}
+                        <div class="alert alert-danger mt-2">{{ otros_formset.non_form_errors }}</div>
+                        {% endif %}
+                        </div>
+                    </div>
+                    <!-- Plantilla oculta para nuevas filas de otros gastos -->
+                    <div id="otros-empty" class="d-none">
+                        <div class="row g-2 align-items-end mb-2 fila-gasto">
+                            <div class="col-md-7">
+                                <label class="form-label">Concepto</label>
+                                {{ otros_formset.empty_form.nombre }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Importe (€)</label>
+                                {{ otros_formset.empty_form.valor }}
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-otro">×</button>
+                            </div>
                         </div>
                     </div>
 
-                    {% if form.errors %}
-                    <div class="alert alert-danger">{{ form.errors }}</div>
-                    {% endif %}
+                {% if form.errors %}
+                <div class="alert alert-danger">{{ form.errors }}</div>
+                {% endif %}
                 </div>
 
-                <div class="col-md-6">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-dark text-white">
-                            <h5 class="mb-0">Resultado</h5>
-                        </div>
-                        <div class="card-body bg-dark text-white">
-                            {% if resultado %}
-                            <p class="mb-1"><span class="text-white-50">[material]</span> {{ resultado.material|floatformat:2 }} € <small class="text-white-50">({{ resultado.gramos_reales|floatformat:1 }}g)</small></p>
-                            <p class="mb-1"><span class="text-white-50">[merma {{ resultado.merma_pct }}%]</span> {{ resultado.coste_merma|floatformat:2 }} €</p>
-                            {% if resultado.electricidad is not None %}
-                            <p class="mb-1"><span class="text-white-50">[electricidad]</span> {{ resultado.electricidad|floatformat:2 }} €</p>
-                            {% endif %}
-                            {% if resultado.mantenimiento is not None %}
-                            <p class="mb-1"><span class="text-white-50">[mantenimiento]</span> {{ resultado.mantenimiento|floatformat:2 }} €</p>
-                            {% endif %}
-                            {% if resultado.mano_obra is not None %}
-                            <p class="mb-1"><span class="text-white-50">[mano de obra]</span> {{ resultado.mano_obra|floatformat:2 }} €</p>
-                            {% endif %}
-                            {% for fila in resultado.otros %}
-                            <p class="mb-1"><span class="text-white-50">[{{ fila.nombre }}]</span> {{ fila.valor|floatformat:2 }} €</p>
-                            {% endfor %}
-                            <hr class="border-secondary">
-                            <p class="mb-1"><span class="text-white-50">[total]</span> <strong>{{ resultado.total|floatformat:2 }} €</strong></p>
-                            <p class="mb-0"><span class="text-white-50">[presupuesto {{ resultado.margen_pct }}%]</span> <span class="text-success fs-5">{{ resultado.presupuesto|floatformat:2 }} €</span></p>
-                            {% else %}
-                            <p class="text-white-50 mb-0">Introduce los datos y pulsa Calcular.</p>
-                            {% endif %}
-                        </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Resultado</h5>
+                    </div>
+                    <div class="card-body bg-dark text-white">
+                        {% if resultado %}
+                        <p class="mb-1"><span class="text-white-50">[material]</span> {{ resultado.material|floatformat:2 }} € <small class="text-white-50">({{ resultado.gramos_reales|floatformat:1 }}g)</small></p>
+                        <p class="mb-1"><span class="text-white-50">[merma {{ resultado.merma_pct }}%]</span> {{ resultado.coste_merma|floatformat:2 }} €</p>
+                        {% if resultado.electricidad is not None %}
+                        <p class="mb-1"><span class="text-white-50">[electricidad]</span> {{ resultado.electricidad|floatformat:2 }} €</p>
+                        {% endif %}
+                        {% if resultado.mantenimiento is not None %}
+                        <p class="mb-1"><span class="text-white-50">[mantenimiento]</span> {{ resultado.mantenimiento|floatformat:2 }} €</p>
+                        {% endif %}
+                        {% if resultado.mano_obra is not None %}
+                        <p class="mb-1"><span class="text-white-50">[mano de obra]</span> {{ resultado.mano_obra|floatformat:2 }} €</p>
+                        {% endif %}
+                        {% for fila in resultado.otros %}
+                        <p class="mb-1"><span class="text-white-50">[{{ fila.nombre }}]</span> {{ fila.valor|floatformat:2 }} €</p>
+                        {% endfor %}
+                        <hr class="border-secondary">
+                        <p class="mb-1"><span class="text-white-50">[total]</span> <strong>{{ resultado.total|floatformat:2 }} €</strong></p>
+                        <p class="mb-0"><span class="text-white-50">[presupuesto {{ resultado.margen_pct }}%]</span> <span class="text-success fs-5">{{ resultado.presupuesto|floatformat:2 }} €</span></p>
+                        {% else %}
+                        <p class="text-white-50 mb-0">Introduce los datos y pulsa Calcular.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-
-            <div class="d-flex gap-2 mt-3">
-                <button type="submit" class="btn btn-success">Calcular</button>
-                <button type="submit" formaction="{% url 'calculadora_csv' %}" class="btn btn-outline-success">Exportar CSV</button>
-            </div>
-        </form>
     </div>
+
+    <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-success">Calcular</button>
+        <button type="submit" formaction="{% url 'calculadora_csv' %}" class="btn btn-outline-success">Exportar
+            CSV</button>
+    </div>
+    </form>
+</div>
 </div>
 
 <script>
@@ -183,6 +217,23 @@
         }
         checkbox.addEventListener('change', actualizar);
         actualizar();
+    });
+
+    var contenedorOtros = document.getElementById('otros-filas');
+    var totalOtros = document.getElementById('id_otros-TOTAL_FORMS');
+    var plantilla = document.getElementById('otros-empty').innerHTML;
+
+    document.getElementById('btn-add-otros').addEventListener('click', function () {
+        var indice = contenedorOtros.querySelectorAll('.fila-gasto').length;
+        contenedorOtros.insertAdjacentHTML('beforeend', plantilla.replace(/__prefix__/g, indice));
+        totalOtros.value = parseInt(totalOtros.value) + 1;
+    });
+
+    contenedorOtros.addEventListener('click', function (evento) {
+        if (evento.target.classList.contains('btn-remove-otro')) {
+            evento.target.closest('.fila-gasto').remove();
+            totalOtros.value = contenedorOtros.querySelectorAll('.fila-gasto').length;
+        }
     });
 </script>
 {% endblock %}
