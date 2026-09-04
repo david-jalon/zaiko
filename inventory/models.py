@@ -75,6 +75,7 @@ class PrintOrder(models.Model):
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     notas = models.TextField(blank=True)
+    coste = models.DecimalField("Coste (€)", max_digits=8, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return f"{self.pieza}"

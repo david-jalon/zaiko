@@ -50,4 +50,7 @@ urlpatterns = [
     # Rutas de exportación
     path("exportar/inventario/", views.export_inventory_csv, name="exportar_inventario"),
     path("exportar/ordenes/", views.export_printorders_csv, name="exportar_ordenes"),
+    # Calculadora
+    path("calculadora/", views.calculadora, name="calculadora"),
+    path("calculadora/csv/", views.calculadora_csv, name="calculadora_csv"),
 ]

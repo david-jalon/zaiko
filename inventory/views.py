@@ -1,14 +1,16 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from accounts.mixins import OperatorRequiredMixin
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count
 from .models import PrintOrder, Printer, Spool, Material, Color, StockThreshold
-from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm, ColorForm, StockThresholdForm, PrintOrderDeleteForm
+from .forms import PrintOrderForm, PrintOrderItemFormSet, SpoolForm, MaterialForm, ColorForm, StockThresholdForm, PrintOrderDeleteForm, CalculadoraForm, OtrosGastosFormSet
 from django.http import HttpResponse
 import csv
+import re
+from datetime import date
 
 
 @login_required
@@ -249,11 +251,136 @@ def export_printorders_csv(request):
     response["Content-Disposition"] = 'attachment; filename="Ordenes_impresion.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(["Pieza", "Impresora", "Bobina", "Gramos usados", "Duración (min)", "Fecha inicio", "Fecha fin"])
+    writer.writerow(["Pieza", "Impresora", "Bobina", "Gramos usados", "Duración (min)", "Coste (€)", "Fecha inicio", "Fecha fin"])
     for order in PrintOrder.objects.prefetch_related("items__spool"):
         for item in order.items.all():
             writer.writerow([
-                order.pieza, order.printer, item.spool, item.gramos_usados, order.duracion_minutos, order.fecha_inicio, order.fecha_fin
+                order.pieza, order.printer, item.spool, item.gramos_usados, order.duracion_minutos, order.coste, order.fecha_inicio, order.fecha_fin
             ])
     return response
 
+# Calculadora
+def calcular_impresion(datos, otros_rows):
+    gramos = datos["gramos"]
+    merma_pct = datos["merma"]
+
+    gramos_reales = gramos * (1 + merma_pct / 100)
+    material = (gramos_reales / 1000) * float(datos["costo_kg"])
+    coste_merma = ((gramos_reales - gramos) / 1000) * float(datos["costo_kg"])
+
+    horas = datos["duracion_min"] / 60
+
+    electricidad = None
+    if datos.get("incluir_electricidad") and datos.get("potencia_w") and datos.get("precio_kwh") is not None:
+        electricidad = (datos["potencia_w"] / 1000) * horas * float(datos["precio_kwh"])
+
+    mantenimiento = None
+    if datos.get("incluir_mantenimiento") and datos.get("mantenimiento_hora") is not None:
+        mantenimiento = float(datos["mantenimiento_hora"]) * horas
+
+    mano_obra = None
+    if datos.get("incluir_mano_obra") and datos.get("mano_obra") is not None:
+        mano_obra = float(datos["mano_obra"])
+
+    otros = []
+    if datos.get("incluir_otros"):
+        otros = [fila for fila in otros_rows if fila["nombre"] and fila["valor"] is not None]
+
+    otros_total = sum(float(fila["valor"]) for fila in otros)
+
+    total = material + coste_merma
+    if electricidad is not None:
+        total += electricidad
+    if mantenimiento is not None:
+        total += mantenimiento
+    if mano_obra is not None:
+        total += mano_obra
+    total += otros_total
+
+    presupuesto = total * (1 + datos["margen"] / 100)
+
+    return {
+        "nombre_pieza": datos["nombre_pieza"],
+        "gramos": gramos,
+        "gramos_reales": gramos_reales,
+        "merma_pct": merma_pct,
+        "material": material,
+        "coste_merma": coste_merma,
+        "electricidad": electricidad,
+        "mantenimiento": mantenimiento,
+        "mano_obra": mano_obra,
+        "otros": otros,
+        "otros_total": otros_total,
+        "total": total,
+        "margen_pct": datos["margen"],
+        "presupuesto": presupuesto,
+    }
+
+@login_required
+def calculadora(request):
+    resultado = None
+
+    if request.method == "POST":
+        form = CalculadoraForm(request.POST)
+        otros_formset = OtrosGastosFormSet(request.POST, prefix="otros")
+        if form.is_valid() and otros_formset.is_valid():
+            otros_rows = [
+                {
+                    "nombre": fila.cleaned_data.get("nombre"),
+                    "valor": fila.cleaned_data.get("valor"),
+                }
+                for fila in otros_formset
+            ]
+            resultado = calcular_impresion(form.cleaned_data, otros_rows)
+    else:
+        form = CalculadoraForm()
+        otros_formset = OtrosGastosFormSet(prefix="otros")
+
+    return render(request, "inventory/calculadora.html", {
+        "form": form,
+        "otros_formset": otros_formset,
+        "resultado": resultado,
+    })
+
+
+@login_required
+def calculadora_csv(request):
+    form = CalculadoraForm(request.POST)
+    otros_formset = OtrosGastosFormSet(request.POST, prefix="otros")
+
+    if form.is_valid() and otros_formset.is_valid():
+        otros_rows = [
+            {
+                "nombre": fila.cleaned_data.get("nombre"),
+                "valor": fila.cleaned_data.get("valor"),
+            }
+            for fila in otros_formset
+        ]
+        r = calcular_impresion(form.cleaned_data, otros_rows)
+
+        nombre_archivo = re.sub(r"[^\w\-]", "_", r["nombre_pieza"]) or "presupuesto"
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = f'attachment; filename="Presupuesto_{nombre_archivo}.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(["Presupuesto", r["nombre_pieza"]])
+        writer.writerow(["Fecha", date.today().isoformat()])
+        writer.writerow([])
+        writer.writerow(["Concepto", "Importe (€)"])
+        writer.writerow([f"Material ({r['gramos']:.0f}g + {r['merma_pct']}% merma)", round(r["material"], 2)])
+        writer.writerow([f"Merma ({r['merma_pct']}%)", round(r["coste_merma"], 2)])
+        if r["electricidad"] is not None:
+            writer.writerow(["Electricidad", round(r["electricidad"], 2)])
+        if r["mantenimiento"] is not None:
+            writer.writerow(["Mantenimiento", round(r["mantenimiento"], 2)])
+        if r["mano_obra"] is not None:
+            writer.writerow(["Mano de obra", round(r["mano_obra"], 2)])
+        for fila in r["otros"]:
+            writer.writerow([f"Otros: {fila['nombre']}", round(float(fila['valor']), 2)])
+        writer.writerow([])
+        writer.writerow(["Total", round(r["total"], 2)])
+        writer.writerow([f"Margen ({r['margen_pct']}%)", round(r["presupuesto"] - r["total"], 2)])
+        writer.writerow(["Presupuesto", round(r["presupuesto"], 2)])
+        return response
+
+    return redirect("calculadora")

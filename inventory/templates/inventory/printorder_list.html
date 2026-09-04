@@ -26,6 +26,7 @@
                             <th>Filamentos</th>
                             <th>Duración (min)</th>
                             <th>Fecha inicio</th>
+                            <th>Coste (€)</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -41,6 +42,7 @@
                             </td>
                             <td>{{ printorder.duracion_minutos }}</td>
                             <td>{{ printorder.fecha_inicio }}</td>
+                            <td>{{ printorder.coste|default:"—" }}</td>
                             <td>
                                 <a href="{% url 'printorder_update' printorder.pk %}"
                                     class="btn btn-sm btn-warning">Editar</a>
@@ -50,7 +52,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6">Aún no hay impresiones.</td>
+                            <td colspan="7">Aún no hay impresiones.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
