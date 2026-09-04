@@ -62,8 +62,7 @@
             {% for alerta in alertas %}
             <li class="list-group-item list-group-item-danger">
                 <i class="ti ti-alert-triangle me-2"></i>
-                {{ alerta.material }} {{ alerta.color }} — {{ alerta.stock_actual }}g (mínimo {{ alerta.stock_minimo
-                }}g)
+                {{ alerta.material }} {{ alerta.color }} — {{ alerta.stock_actual }}g (mínimo {{ alerta.stock_minimo}}g)
             </li>
             {% endfor %}
         </ul>
